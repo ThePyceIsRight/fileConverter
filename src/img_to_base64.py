@@ -3,6 +3,8 @@ from pillow_heif import register_heif_opener
 import os
 import base64
 import csv
+import time
+import io
 
 register_heif_opener()
 
@@ -45,18 +47,33 @@ def image_to_image(folder_path: str, img_ext: list[str], delete_files: bool = Fa
 
             # Check if the file is an image
             if filename.endswith(extension):
+                # Delay
+                time.sleep(0.01)
 
+                image_path = f"{folder_path}/{filename}"
+
+                new_height = 100
+
+                image = Image.open(image_path)
+                width, height = image.size
+                new_width = int(width * new_height / height)
+                resized_image = image.resize((new_width, new_height))
+
+                with io.BytesIO() as buffer:
+                    resized_image.save(buffer, format="png")
+                    encoded_string = base64.b64encode(buffer.getvalue()).decode("utf-8")
                 # Open image and convert to base64 string
-                with open(f"{folder_path}/{filename}", "rb") as image_file:
-                    encoded_string = base64.b64encode(image_file.read())
+                # with open(image_path, "rb") as image_file:
+                #     encoded_string = base64.b64encode(image_file.read())
 
                 # Write base64 to csv list file
                 with open(base64_list_path, 'a', newline='') as csvfile:
                     csv_writer = csv.writer(csvfile)
-                    csv_writer.writerow([filename, encoded_string])
+                    csv_writer.writerow([os.path.splitext(os.path.basename(filename))[0], encoded_string])
 
+                # Delete file if option selected
                 if delete_files:
-                    os.remove(f"{folder_path}/{filename}")
+                    os.remove(image_path)
 
 
 if __name__ == '__main__':

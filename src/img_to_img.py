@@ -5,7 +5,7 @@ import os
 register_heif_opener()
 
 
-def image_to_image(folder_path: str, old_type: str, new_type: str, delete_files: bool = False):
+def image_to_image(folder_path: str, old_type: str, new_type: str, delete_files: bool = False, compress_img: bool = True, new_size: int = 1500):
     """
     Converts all images in a folder to the specified image type
 
@@ -15,10 +15,15 @@ def image_to_image(folder_path: str, old_type: str, new_type: str, delete_files:
     :param delete_files: set to True to delete converted files
     """
 
+    print(f"\nbeginning type conversion process. delete file after conversion = {delete_files}")
+
     old_type = old_type.replace(".", "")
     new_type = new_type.replace(".", "")
 
-    print(f"{folder_path}\n{old_type}\n{new_type}")
+    print(f"\nchosen params:\n    path: {folder_path}\n    from type: {old_type}\n    to type: {new_type}\n    delete "
+          f"original: {delete_files}\n    compress image: {compress_img}\n    new size: {new_size}\n")
+
+    i = 0
 
     # Loop through all files in the directory
     for filename in os.listdir(folder_path):
@@ -28,12 +33,42 @@ def image_to_image(folder_path: str, old_type: str, new_type: str, delete_files:
             # Open the file
             img = Image.open(f"{folder_path}/{filename}")
 
+            # New img name
+            str_new_name = f"{folder_path}/{os.path.splitext(os.path.basename(filename))[0]}.{new_type}"
+
             # Save the image in new format
-            img.save(f"{folder_path}/{os.path.splitext(os.path.basename(filename))[0]}.{new_type}")
+            if compress_img:
+                width, height = img.size
+                if width > new_size:
+                    ratio = new_size / width
+                    height = int(height * ratio)
+                    img = img.resize((new_size, height))
+                    status_msg = "resized, "
+                img =  img.convert("P", palette=Image.ADAPTIVE, colors=256)
+                status_msg = f"{status_msg}compressed, "
+                img.save(str_new_name)
+            else:
+                img.save(str_new_name)
 
             if delete_files:
                 os.remove(f"{folder_path}/{filename}")
 
+            i = i + 1
+
+            if delete_files:
+                print(f"{filename} {status_msg}converted and deleted")
+            else:
+                print(f"{filename} {status_msg}converted")
+
+            status_msg = ""
+
+    print(f"\nprocess complete: {i} pictures converted from {old_type} to {new_type}")
+
 
 if __name__ == '__main__':
-    image_to_image("C:/Users/lprice/OneDrive - Range Resources/Desktop/Imagine 2023 Images", "heic", "png")
+    image_to_image(folder_path="C:/Users/lprice/OneDrive - Range Resources/Desktop/6 Stones - 10.23/to HR/compressed",
+                   old_type="png",
+                   new_type="png",
+                   delete_files=False,
+                   compress_img=True,
+                   new_size=1500)
