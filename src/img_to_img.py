@@ -15,13 +15,13 @@ def image_to_image(folder_path: str, old_type: str, new_type: str, delete_files:
     :param delete_files: set to True to delete converted files
     """
 
-    print(f"\nbeginning type conversion process. delete file after conversion = {delete_files}")
+    print(f"/nbeginning type conversion process. delete file after conversion = {delete_files}")
 
     old_type = old_type.replace(".", "")
     new_type = new_type.replace(".", "")
 
-    print(f"\nchosen params:\n    path: {folder_path}\n    from type: {old_type}\n    to type: {new_type}\n    delete "
-          f"original: {delete_files}\n    compress image: {compress_img}\n    new size: {new_size}\n")
+    print(f"/nchosen params:/n    path: {folder_path}/n    from type: {old_type}/n    to type: {new_type}/n    delete "
+          f"original: {delete_files}/n    compress image: {compress_img}/n    new size: {new_size}/n")
 
     i = 0
 
@@ -30,6 +30,8 @@ def image_to_image(folder_path: str, old_type: str, new_type: str, delete_files:
 
         # Check if the file is an image
         if filename.endswith(old_type):
+            status_msg = ""
+
             # Open the file
             img = Image.open(f"{folder_path}/{filename}")
 
@@ -62,13 +64,13 @@ def image_to_image(folder_path: str, old_type: str, new_type: str, delete_files:
 
             status_msg = ""
 
-    print(f"\nprocess complete: {i} pictures converted from {old_type} to {new_type}")
+    print(f"/nprocess complete: {i} pictures converted from {old_type} to {new_type}")
 
 
 if __name__ == '__main__':
-    image_to_image(folder_path="C:/Users/lprice/OneDrive - Range Resources/Desktop/6 Stones - 10.23/to HR/compressed",
-                   old_type="png",
+    image_to_image(folder_path="C:/Users/lprice/OneDrive - Range Resources/Desktop/delete/New folder",
+                   old_type="webp",
                    new_type="png",
                    delete_files=False,
-                   compress_img=True,
+                   compress_img=False,
                    new_size=1500)
